@@ -7,27 +7,65 @@
 <ion-content padding>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>{{ editingIndex !== null ? 'Edit Task' : 'Add Task' }}</ion-card-title>
+      <ion-card-title>{{ indiceEdicao !== null ? 'Editar Tarefa' : 'Adicionar Tarefa' }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-item>
-        <ion-input [(ngModel)]="task" placeholder="Enter your task"></ion-input>
-        <ion-button expand="full" (click)="addTask()">
-          {{ editingIndex !== null ? 'Update Task' : 'Add Task' }}
-        </ion-button>
+        <ion-input [(ngModel)]="tarefa" placeholder="Digite sua tarefa"></ion-input>
       </ion-item>
+      <ion-item>
+        <ion-select [(ngModel)]="categoria" placeholder="Categoria">
+          <ion-select-option *ngFor="let cat of categorias">{{ cat }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-datetime [(ngModel)]="dataVencimento" placeholder="Data de Vencimento"></ion-datetime>
+      </ion-item>
+      <ion-item>
+        <ion-select [(ngModel)]="prioridade" placeholder="Prioridade">
+          <ion-select-option value="Baixa">Baixa</ion-select-option>
+          <ion-select-option value="Média">Média</ion-select-option>
+          <ion-select-option value="Alta">Alta</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button expand="full" (click)="adicionarTarefa()">
+        {{ indiceEdicao !== null ? 'Atualizar Tarefa' : 'Adicionar Tarefa' }}
+      </ion-button>
     </ion-card-content>
   </ion-card>
 
+  <ion-segment [(ngModel)]="filtro">
+    <ion-segment-button value="todas">
+      Todas
+    </ion-segment-button>
+    <ion-segment-button value="pendentes">
+      Pendentes
+    </ion-segment-button>
+    <ion-segment-button value="concluidas">
+      Concluídas
+    </ion-segment-button>
+    <ion-segment-button value="altaPrioridade">
+      Alta Prioridade
+    </ion-segment-button>
+  </ion-segment>
+
   <ion-list>
-    <ion-item *ngFor="let task of tasks; let i = index">
-      <ion-label>{{ task }}</ion-label>
+    <ion-item *ngFor="let tarefa of tarefasFiltradas(); let i = index">
+      <ion-label>
+        <h2>{{ tarefa.descricao }}</h2>
+        <p>Categoria: {{ tarefa.categoria }}</p>
+        <p>Data de Vencimento: {{ tarefa.dataVencimento | date: 'shortDate' }}</p>
+        <p>Prioridade: {{ tarefa.prioridade }}</p>
+      </ion-label>
       <ion-buttons slot="end">
-        <ion-button (click)="editTask(i)" color="primary">
+        <ion-button (click)="editarTarefa(i)" color="primary">
           <ion-icon name="create-outline"></ion-icon>
         </ion-button>
-        <ion-button (click)="deleteTask(i)" color="danger">
+        <ion-button (click)="deletarTarefa(i)" color="danger">
           <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="toggleConcluida(i)" color="success">
+          <ion-icon name="checkmark-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
     </ion-item>

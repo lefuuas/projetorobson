@@ -1,5 +1,14 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
+import { ToastController } from '@ionic/angular';
+
+interface Tarefa {
+  descricao: string;
+  categoria: string;
+  dataVencimento: string;
+  prioridade: string;
+  concluida: boolean;
+}
 
 @Component({
   selector: 'app-home',
@@ -7,46 +16,97 @@ import { Storage } from '@ionic/storage-angular';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  task: string = '';
-  tasks: string[] = [];
-  editingIndex: number | null = null;
+  tarefa: string = '';
+  categoria: string = '';
+  dataVencimento: string = '';
+  prioridade: string = 'Média';
+  tarefas: Tarefa[] = [];
+  indiceEdicao: number | null = null;
+  filtro: string = 'todas';
+  categorias: string[] = ['Trabalho', 'Estudos', 'Pessoal', 'Outros'];
 
-  constructor(private storage: Storage) {
+  constructor(private storage: Storage, private toastController: ToastController) {
     this.init();
   }
 
   async init() {
     await this.storage.create();
-    this.loadTasks();
+    this.carregarTarefas();
   }
 
-  async loadTasks() {
-    const storedTasks = await this.storage.get('tasks');
-    if (storedTasks) {
-      this.tasks = storedTasks;
+  async carregarTarefas() {
+    const tarefasArmazenadas = await this.storage.get('tarefas');
+    if (tarefasArmazenadas) {
+      this.tarefas = tarefasArmazenadas;
     }
   }
 
-  async addTask() {
-    if (this.task.trim() !== '') {
-      if (this.editingIndex !== null) {
-        this.tasks[this.editingIndex] = this.task;
-        this.editingIndex = null;
+  async adicionarTarefa() {
+    if (this.tarefa.trim() !== '') {
+      if (this.indiceEdicao !== null) {
+        this.tarefas[this.indiceEdicao] = {
+          descricao: this.tarefa,
+          categoria: this.categoria,
+          dataVencimento: this.dataVencimento,
+          prioridade: this.prioridade,
+          concluida: this.tarefas[this.indiceEdicao].concluida,
+        };
+        this.indiceEdicao = null;
       } else {
-        this.tasks.push(this.task);
+        this.tarefas.push({
+          descricao: this.tarefa,
+          categoria: this.categoria,
+          dataVencimento: this.dataVencimento,
+          prioridade: this.prioridade,
+          concluida: false,
+        });
       }
-      this.task = '';
-      await this.storage.set('tasks', this.tasks);
+      this.tarefa = '';
+      this.categoria = '';
+      this.dataVencimento = '';
+      this.prioridade = 'Média';
+      await this.storage.set('tarefas', this.tarefas);
+      this.mostrarMensagem('Tarefa salva com sucesso!');
     }
   }
 
-  editTask(index: number) {
-    this.task = this.tasks[index];
-    this.editingIndex = index;
+  editarTarefa(index: number) {
+    const tarefa = this.tarefas[index];
+    this.tarefa = tarefa.descricao;
+    this.categoria = tarefa.categoria;
+    this.dataVencimento = tarefa.dataVencimento;
+    this.prioridade = tarefa.prioridade;
+    this.indiceEdicao = index;
   }
 
-  async deleteTask(index: number) {
-    this.tasks.splice(index, 1);
-    await this.storage.set('tasks', this.tasks);
+  async deletarTarefa(index: number) {
+    this.tarefas.splice(index, 1);
+    await this.storage.set('tarefas', this.tarefas);
+    this.mostrarMensagem('Tarefa deletada com sucesso!');
+  }
+
+  async toggleConcluida(index: number) {
+    this.tarefas[index].concluida = !this.tarefas[index].concluida;
+    await this.storage.set('tarefas', this.tarefas);
+  }
+
+  tarefasFiltradas() {
+    if (this.filtro === 'pendentes') {
+      return this.tarefas.filter(tarefa => !tarefa.concluida);
+    } else if (this.filtro === 'concluidas') {
+      return this.tarefas.filter(tarefa => tarefa.concluida);
+    } else if (this.filtro === 'altaPrioridade') {
+      return this.tarefas.filter(tarefa => tarefa.prioridade === 'Alta');
+    } else {
+      return this.tarefas;
+    }
+  }
+
+  async mostrarMensagem(mensagem: string) {
+    const toast = await this.toastController.create({
+      message: mensagem,
+      duration: 2000
+    });
+    toast.present();
   }
 }
