@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Lista de Afazeres</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ editingIndex !== null ? 'Edit Task' : 'Add Task' }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-input [(ngModel)]="task" placeholder="Enter your task"></ion-input>
+        <ion-button expand="full" (click)="addTask()">
+          {{ editingIndex !== null ? 'Update Task' : 'Add Task' }}
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list>
+    <ion-item *ngFor="let task of tasks; let i = index">
+      <ion-label>{{ task }}</ion-label>
+      <ion-buttons slot="end">
+        <ion-button (click)="editTask(i)" color="primary">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="deleteTask(i)" color="danger">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+</ion-content>

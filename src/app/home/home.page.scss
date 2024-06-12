@@ -1,0 +1,35 @@
+ion-header {
+  --background: #3880ff;
+  --color: white;
+}
+
+ion-toolbar {
+  --background: #3880ff;
+}
+
+ion-card {
+  margin: 20px;
+}
+
+ion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ion-input {
+  flex: 1;
+}
+
+ion-button {
+  margin-left: 10px;
+}
+
+ion-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+ion-icon {
+  font-size: 1.2em;
+}

@@ -1,0 +1,7 @@
+{
+  "name": "robsunproject",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
